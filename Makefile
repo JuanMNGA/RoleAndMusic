@@ -11,7 +11,7 @@ $(PROJECT): $(OBJETOS)
 all: $(PROJECT)
 
 clean:
-	$(RM) $(OBJETOS) *~
+	$(RM) $(OBJETOS) $(PROJECT) *~
 
 #juego.o: juego.h tablero.h
 #tablero.o: tablero.h
