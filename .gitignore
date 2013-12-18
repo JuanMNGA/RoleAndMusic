@@ -1,5 +1,5 @@
 #.gitignore
 bin/*
 obj/*
-Samples/*.wav
-Samples/*.ogg
+*.wav
+*.ogg
