@@ -10,170 +10,146 @@ using namespace sf;
 int main(){
 	//Cargar ventana renderizada
 	RenderWindow App(VideoMode(600,500,32),"Role&Music v1.0.0");
-	//Objetos que contendran las imagenes (Graficos) de nuestra aplicacion
-	Texture BG, Play1, Play2, Play3, Play4, Stop1, Stop2, Stop3, Stop4, Label1, Label2, Label3, Label4, Volume1, Volume2, Volume3, Volume4;
-	//Objetos que contendran la musica
-	Music M1,M2,M3,M4;
-	//Carga de la fuente del texto
-	Font fonts;
-	fonts.loadFromFile("Fonts/font.ttf");
-	//Carga de los textos
-	//Texto titulo
-	Text text1;
-	text1.setPosition(320,450);
-	text1.setFont(fonts);
-	text1.setString("Role&Music v1.0.0");
-	text1.setCharacterSize(40);
-	text1.setColor(Color::Red);
-	//Texto instrucciones
-	Text text2;
-	text2.setFont(fonts);
-	text2.setString(" Cliquee encima del espacio para escritura, cuando se marque el recuadro,\n escriba el nombre de la cancion deseada acabado en .wav o .ogg,\n la cancion debe estar en formato .wav o .ogg para su correcta\n reproduccion. Por ultimo, pulse enter para cargar la cancion.");
-	text2.setCharacterSize(20);
-	text2.setColor(Color::Black);
-	//Carga de imagenes en los objetos anteriores
-	BG.loadFromFile("Images/Background.bmp");
-	//Carga botones Play Stop
-	Play1.loadFromFile("Images/Play.png");
-	Stop1.loadFromFile("Images/Stop.png");
-	Play2.loadFromFile("Images/Play.png");
-	Stop2.loadFromFile("Images/Stop.png");
-	Play3.loadFromFile("Images/Play.png");
-	Stop3.loadFromFile("Images/Stop.png");
-	Play4.loadFromFile("Images/Play.png");
-	Stop4.loadFromFile("Images/Stop.png");
-	//Carga de Texturas Labels
-	Label1.loadFromFile("Images/Label.png");
-	Label2.loadFromFile("Images/Label.png");
-	Label3.loadFromFile("Images/Label.png");
-	Label4.loadFromFile("Images/Label.png");
-	//Creacion de Sprites
-	Sprite Background(BG);
-	//Sprites de botones Play y Stop
-	Sprite Play1_;
-	Play1_.setTexture(Play1);
-	Sprite Stop1_;
-	Stop1_.setTexture(Stop1);
-	Sprite Play2_;
-	Play2_.setTexture(Play2);
-	Sprite Stop2_;
-	Stop2_.setTexture(Stop2);
-	Sprite Play3_;
-	Play3_.setTexture(Play3);
-	Sprite Stop3_;
-	Stop3_.setTexture(Stop3);
-	Sprite Play4_;
-	Play4_.setTexture(Play4);
-	Sprite Stop4_;
-	Stop4_.setTexture(Stop4);
-	//Sprites de los Labels
-	Sprite Label1_;
-	Label1_.setTexture(Label1);
-	Sprite Label2_;
-	Label2_.setTexture(Label2);
-	Sprite Label3_;
-	Label3_.setTexture(Label3);
-	Sprite Label4_;
-	Label4_.setTexture(Label4);
-	//Carga de la musica
-	M1.openFromFile("Samples/1.wav");
-	M2.openFromFile("Samples/2.wav");
-	M3.openFromFile("Samples/3.wav");
-	M4.openFromFile("Samples/4.wav");
-	//Lazo que mantendra la ventana abierta hasta que sea cerrada.
-	while(App.isOpen()){
-		Event Evento;
-		while(App.pollEvent(Evento)){
-			if(Evento.type==Event::Closed){
-				App.close();
+	//Variables
+	bool Set_Rep=false;
+	bool Sel_Lab[7];
+    //Inicializacion de variables
+    for(int i=0;i<7;i++)
+        Sel_Lab[i]=false;
+    //Creacion de objetos
+    Texture TX[7];
+    Sprite BG;
+    Sprite Play[7];
+    Sprite Stop[7];
+    Sprite Label[7];
+    Sprite Repr[2];
+    Sprite SelLab[7];
+    Text Textos[2];
+    Font fuente;
+	Music Pistas[7];
+	//Inicializacion de objetos
+        //Fuente
+        fuente.loadFromFile("Fonts/font.ttf");
+        //Textos
+        Textos[0] = Text("Role&Music v1.0.0",fuente,40);
+        Textos[0].setPosition(320,450);
+        Textos[0].setColor(Color::Red);
+        Textos[1] = Text(" Cliquee encima del espacio para escritura, cuando se marque el recuadro,\n escriba el nombre de la cancion deseada acabado en .wav o .ogg,\n la cancion debe estar en formato .wav o .ogg para su correcta\n reproduccion. Por ultimo, pulse enter para cargar la cancion.",fuente,20);
+        Textos[1].setColor(Color::Red);
+        //Fondo
+        TX[0].loadFromFile("Images/Background.bmp");
+        BG.setTexture(TX[0]);
+        //Botones Play
+        TX[1].loadFromFile("Images/Play.png");
+        for(int i=0;i<7;i++){
+            Play[i].setTexture(TX[1]);
+            Play[i].setPosition(400,150+(45*i));
+        }
+        //Botones Stop
+        TX[2].loadFromFile("Images/Stop.png");
+        for(int i=0;i<7;i++){
+            Stop[i].setTexture(TX[2]);
+            Stop[i].setPosition(455,150+(45*i));
+        }
+        //Botones Label
+        TX[3].loadFromFile("Images/Label.png");
+        for(int i=0;i<7;i++){
+            Label[i].setTexture(TX[3]);
+            Label[i].setPosition(60,150+(45*i));
+        }
+        //Sprite Botones Reproductor
+        TX[4].loadFromFile("Images/ReproductorG.png");
+        Repr[0].setTexture(TX[4]);
+        Repr[0].setPosition(400,90);
+        TX[5].loadFromFile("Images/ReproductorB.png");
+        Repr[1].setTexture(TX[5]);
+        Repr[1].setPosition(400,90);
+        //Sprite seleccion labels
+        TX[6].loadFromFile("Images/Select.png");
+        for(int i=0;i<7;i++){
+            SelLab[i].setTexture(TX[6]);
+            SelLab[i].setPosition(10,150+(45*i));
+        }
+        //Inicializacion de las pistas (Pruebas)
+        Pistas[0].openFromFile("Samples/1.wav");
+        Pistas[1].openFromFile("Samples/2.wav");
+
+    //Inicio lazo principal
+    while(App.isOpen()){
+        Event evento;
+        while(App.pollEvent(evento)){
+            if(evento.type == Event::Closed){
+                App.close();
+            }
+            if(evento.type == Event::MouseButtonPressed){
+                if(evento.mouseButton.button == Mouse::Left){
+                    Vector2f Position(Mouse::getPosition(App));
+                    if(Position.x>=400 && Set_Rep==true){
+                        for(int i=0;i<7;i++){
+                            if(Play[i].getGlobalBounds().contains(Position.x,Position.y)){
+                                Pistas[i].play();
+                            }
+                            if(Stop[i].getGlobalBounds().contains(Position.x,Position.y)){
+                                Pistas[i].stop();
+                            }
+                        }
+                    }
+                    //Fin if posicion
+                    if(Repr[0].getGlobalBounds().contains(Position.x,Position.y)){
+							if(Set_Rep==false){
+								Set_Rep=true;
+							}else{
+								Set_Rep=false;
+								for(int i=0;i<7;i++){
+                                    Pistas[i].stop();
+								}
+							}
+                    }//Fin if Modo reproductor
+					if(Position.x>60 && Position.x<315){
+						for(int i=0;i<7;i++){
+							if(Label[i].getGlobalBounds().contains(Position.x,Position.y)){
+								Sel_Lab[i] = true;
+							}else{
+								Sel_Lab[i] = false;
+							}
+						}
+					}
+					//Fin if boton izquierdo
+                }
+                if(evento.mouseButton.button == Mouse::Right){
+                    Vector2f Position(Mouse::getPosition(App));
+                    if(Position.x>=400){
+                        for(int i=0;i<7;i++){
+                            if(Play[i].getGlobalBounds().contains(Position.x,Position.y)){
+                                Pistas[i].setLoop(true);
+                                Pistas[i].play();
+                            }
+                        }
+                    }
+                    //Fin if posicion
+                }
+                //Fin if boton derecho
+            }
+            //Fin if evento raton
+        }
+        //Fin eventos
+        App.clear();
+        for(int i=0;i<7;i++){
+            App.draw(Play[i]);
+            App.draw(Stop[i]);
+            App.draw(Label[i]);
+        }
+        if(Set_Rep==true){
+				App.draw(Repr[0]);
+			}else{
+				App.draw(Repr[1]);
 			}
-			/*if(App.getInput().isKeyDown(Key::W)){
-				M1.setLoop(true);
-				M1.play();
-			}*/
-			//Botones Graficos
-			if(Evento.type == Event::MouseButtonPressed){
-				//Eventos con boton izquierdo de raton
-				if(Evento.mouseButton.button == sf::Mouse::Left){
-					if((Evento.mouseButton.x > Play1_.getPosition().x && Evento.mouseButton.x <= Play1_.getPosition().x+50)&&(Evento.mouseButton.y > Play1_.getPosition().y && Evento.mouseButton.y <= Play1_.getPosition().y+40)){
-						M1.play();
-					}
-					if((Evento.mouseButton.x > Stop1_.getPosition().x && Evento.mouseButton.x <= Stop1_.getPosition().x+50)&&(Evento.mouseButton.y > Stop1_.getPosition().y && Evento.mouseButton.y <= Stop1_.getPosition().y+40)){
-						M1.stop();
-					}
-					if((Evento.mouseButton.x > Play2_.getPosition().x && Evento.mouseButton.x <= Play2_.getPosition().x+50)&&(Evento.mouseButton.y > Play2_.getPosition().y && Evento.mouseButton.y <= Play2_.getPosition().y+40)){
-						M2.play();
-					}
-					if((Evento.mouseButton.x > Stop2_.getPosition().x && Evento.mouseButton.x <= Stop2_.getPosition().x+50)&&(Evento.mouseButton.y > Stop2_.getPosition().y && Evento.mouseButton.y <= Stop2_.getPosition().y+40)){
-						M2.stop();
-					}
-					if((Evento.mouseButton.x > Play3_.getPosition().x && Evento.mouseButton.x <= Play3_.getPosition().x+50)&&(Evento.mouseButton.y > Play3_.getPosition().y && Evento.mouseButton.y <= Play3_.getPosition().y+40)){
-						M3.play();
-					}
-					if((Evento.mouseButton.x > Stop3_.getPosition().x && Evento.mouseButton.x <= Stop3_.getPosition().x+50)&&(Evento.mouseButton.y > Stop3_.getPosition().y && Evento.mouseButton.y <= Stop3_.getPosition().y+40)){
-						M3.stop();
-					}
-					if((Evento.mouseButton.x > Play4_.getPosition().x && Evento.mouseButton.x <= Play4_.getPosition().x+50)&&(Evento.mouseButton.y > Play4_.getPosition().y && Evento.mouseButton.y <= Play4_.getPosition().y+40)){
-						M4.play();
-					}
-					if((Evento.mouseButton.x > Stop4_.getPosition().x && Evento.mouseButton.x <= Stop4_.getPosition().x+50)&&(Evento.mouseButton.y > Stop4_.getPosition().y && Evento.mouseButton.y <= Stop4_.getPosition().y+40)){
-						M4.stop();
-					}
-				}
-				//Eventos con boton derecho del raton
-				if(Evento.mouseButton.button == sf::Mouse::Right){
-					if((Evento.mouseButton.x > Play1_.getPosition().x && Evento.mouseButton.x <= Play1_.getPosition().x+50)&&(Evento.mouseButton.y > Play1_.getPosition().y && Evento.mouseButton.y <= Play1_.getPosition().y+40)){
-						M1.setLoop(true);
-						M1.play();
-					}
-					if((Evento.mouseButton.x > Play2_.getPosition().x && Evento.mouseButton.x <= Play2_.getPosition().x+50)&&(Evento.mouseButton.y > Play2_.getPosition().y && Evento.mouseButton.y <= Play2_.getPosition().y+40)){
-						M2.setLoop(true);
-						M2.play();
-					}
-					if((Evento.mouseButton.x > Play3_.getPosition().x && Evento.mouseButton.x <= Play3_.getPosition().x+50)&&(Evento.mouseButton.y > Play3_.getPosition().y && Evento.mouseButton.y <= Play3_.getPosition().y+40)){
-						M3.setLoop(true);
-						M3.play();
-					}
-					if((Evento.mouseButton.x > Play4_.getPosition().x && Evento.mouseButton.x <= Play4_.getPosition().x+50)&&(Evento.mouseButton.y > Play4_.getPosition().y && Evento.mouseButton.y <= Play4_.getPosition().y+40)){
-						M4.setLoop(true);
-						M4.play();
-					}
-				}
+			for(int i=0;i<7;i++){
+				if(Sel_Lab[i]==true)App.draw(SelLab[i]);
 			}
-		}
-		//Limpieza de pantalla
-		App.clear();
-		//Actualizacion:
-		Play1_.setPosition(400,150);
-		Stop1_.setPosition(455,150);
-		Play2_.setPosition(400,195);
-		Stop2_.setPosition(455,195);
-		Play3_.setPosition(400,240);
-		Stop3_.setPosition(455,240);
-		Play4_.setPosition(400,285);
-		Stop4_.setPosition(455,285);
-		Label1_.setPosition(45,150);
-		Label2_.setPosition(45,195);
-		Label3_.setPosition(45,240);
-		Label4_.setPosition(45,285);
-		//Carga de graficos
-		App.draw(Background);
-		App.draw(Play1_);
-		App.draw(Stop1_);
-		App.draw(Play2_);
-		App.draw(Stop2_);
-		App.draw(Play3_);
-		App.draw(Stop3_);
-		App.draw(Play4_);
-		App.draw(Stop4_);
-		App.draw(text1);
-		App.draw(text2);
-		App.draw(Label1_);
-		App.draw(Label2_);
-		App.draw(Label3_);
-		App.draw(Label4_);
-		//Muestra la pantalla cargada
-		App.display();
-	}
+			App.draw(Textos[0]);
+			App.draw(Textos[1]);
+			App.display();
+    }
 	return EXIT_SUCCESS;
 }
