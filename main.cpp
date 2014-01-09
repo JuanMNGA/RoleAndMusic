@@ -6,6 +6,7 @@
 #include <SFML/Window.hpp>
 
 using namespace sf;
+using namespace std;
 
 int main(){
 	//Cargar ventana renderizada
@@ -27,6 +28,9 @@ int main(){
     Text Textos[2];
     Font fuente;
 	Music Pistas[7];
+	String Cancion;
+	Text Canciones[7];
+	string str;
 	//Inicializacion de objetos
         //Fuente
         fuente.loadFromFile("Fonts/font.ttf");
@@ -37,7 +41,7 @@ int main(){
         Textos[1] = Text(" Cliquee encima del espacio para escritura, cuando se marque el recuadro,\n escriba el nombre de la cancion deseada acabado en .wav o .ogg,\n la cancion debe estar en formato .wav o .ogg para su correcta\n reproduccion. Por ultimo, pulse enter para cargar la cancion.",fuente,20);
         Textos[1].setColor(Color::Red);
         //Fondo
-        TX[0].loadFromFile("Images/Background.bmp");
+        TX[0].loadFromFile("Images/Background.png");
         BG.setTexture(TX[0]);
         //Botones Play
         TX[1].loadFromFile("Images/Play.png");
@@ -70,14 +74,11 @@ int main(){
             SelLab[i].setTexture(TX[6]);
             SelLab[i].setPosition(10,150+(45*i));
         }
-        //Inicializacion de las pistas (Pruebas)
-        Pistas[0].openFromFile("Samples/1.wav");
-        Pistas[1].openFromFile("Samples/2.wav");
 
     //Inicio lazo principal
     while(App.isOpen()){
         Event evento;
-        while(App.pollEvent(evento)){
+        if(App.pollEvent(evento)){
             if(evento.type == Event::Closed){
                 App.close();
             }
@@ -98,6 +99,10 @@ int main(){
                     if(Repr[0].getGlobalBounds().contains(Position.x,Position.y)){
 							if(Set_Rep==false){
 								Set_Rep=true;
+								for(int i=0;i<7;i++){
+                                    if(!Canciones[i].getString().isEmpty())
+                                        Pistas[i].openFromFile(String("Samples/")+String(Canciones[i].getString()));
+								}
 							}else{
 								Set_Rep=false;
 								for(int i=0;i<7;i++){
@@ -109,6 +114,11 @@ int main(){
 						for(int i=0;i<7;i++){
 							if(Label[i].getGlobalBounds().contains(Position.x,Position.y)){
 								Sel_Lab[i] = true;
+								if(Canciones[i].getString().isEmpty()){
+                                    str=string();
+                                }else{
+                                    str=Canciones[i].getString();
+                                }
 							}else{
 								Sel_Lab[i] = false;
 							}
@@ -131,9 +141,33 @@ int main(){
                 //Fin if boton derecho
             }
             //Fin if evento raton
+            if(evento.type == Event::TextEntered){
+                    if(evento.text.unicode < 128 && Set_Rep==false){
+                        str += static_cast<char>(evento.text.unicode);
+                    }
+            }
+            //Fin evento entrada por teclado
+            if(Keyboard::isKeyPressed(Keyboard::Key::BackSpace)){
+                for(int i=0;i<7;i++){
+                    if(Sel_Lab[i]==true && Set_Rep == false){
+                        str=string();
+                    }
+                }
+            }
+        }
+        if(Set_Rep==false){
+            for(int i=0;i<7;i++){
+                if(Sel_Lab[i]==true){
+                    Cancion = String(str);
+                    Canciones[i].setFont(fuente);
+                    Canciones[i].setString(String(str));
+                    Canciones[i].setPosition(Label[i].getPosition().x+4,Label[i].getPosition().y+4);
+                }
+            }
         }
         //Fin eventos
         App.clear();
+        App.draw(BG);
         for(int i=0;i<7;i++){
             App.draw(Play[i]);
             App.draw(Stop[i]);
@@ -144,12 +178,15 @@ int main(){
 			}else{
 				App.draw(Repr[1]);
 			}
-			for(int i=0;i<7;i++){
-				if(Sel_Lab[i]==true)App.draw(SelLab[i]);
-			}
-			App.draw(Textos[0]);
-			App.draw(Textos[1]);
-			App.display();
+        for(int i=0;i<7;i++){
+			if(Sel_Lab[i]==true)App.draw(SelLab[i]);
+		}
+		for(int i=0;i<7;i++){
+            App.draw(Canciones[i]);
+		}
+        App.draw(Textos[0]);
+		App.draw(Textos[1]);
+		App.display();
     }
 	return EXIT_SUCCESS;
 }
