@@ -45,15 +45,15 @@ string itoa(int num)
 
 int main(){
 	//Cargar ventana renderizada
-	RenderWindow App(VideoMode(600,500,32),"Role&Music v1.0.0");
+	RenderWindow App(VideoMode(600,500,32),"Role&Music v1.0.0",sf::Style::Close);
 	//Variables
 	bool Set_Rep=false;
 	bool Sel_Lab[7];
-	bool Load_Sou[7];
+	//bool Load_Sou[7];
     //Inicializacion de variables
     for(int i=0;i<7;i++){
         Sel_Lab[i]=false;
-        Load_Sou[i]=false;
+        //Load_Sou[i]=false;
     }
     //Creacion de objetos
     Texture TX[7];
@@ -270,8 +270,8 @@ int main(){
 								Set_Rep=true;
 								for(int i=0;i<7;i++){
                                     if(!Canciones[i].getString().isEmpty())
-                                        if(Pistas_[i].loadFromFile(String("Samples/")+String(Canciones[i].getString())))
-                                            Load_Sou[i]=true;
+                                        if(Pistas_[i].loadFromFile(String("Samples/")+String(Canciones[i].getString())));
+                                            //Load_Sou[i]=true;
                                         Pistas[i].setBuffer(Pistas_[i]);
                                         Pistas[i].setVolume(50);
 								}
@@ -325,18 +325,14 @@ int main(){
                 for(int i=0;i<7;i++){
                     if(Sel_Lab[i]==true && Set_Rep == false){
                         str=string();
-                        Load_Sou[i]=false;
                     }
                 }
             }
             //Borrar solo un caracter
             if(Keyboard::isKeyPressed(Keyboard::Key::BackSpace)){
                 for(int i=0;i<7;i++){
-                    if(Sel_Lab[i]==true && Set_Rep == false && str.length()!=0){
+                    if(Sel_Lab[i]==true && Set_Rep == false && str.length()>0){
                         str.erase((str.length()-1),1);
-                    }
-                    if(str.length()==0){
-                        Load_Sou[i]=false;
                     }
                 }
             }
