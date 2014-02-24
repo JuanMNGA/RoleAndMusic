@@ -1,4 +1,6 @@
 #include <iostream>
+#include <sstream>
+#include <fstream>
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
 #include <SFML/System.hpp>
@@ -8,15 +10,51 @@
 using namespace sf;
 using namespace std;
 
+template <typename T>
+void write(std::ofstream& stream, const T& t) {
+  stream.write((const char*)&t, sizeof(T));
+}
+
+template <typename SampleType>
+void writeWAVData(const char* outFile, SampleType* buf, size_t bufSize,
+                  int sampleRate, short channels)
+{
+  std::ofstream stream(outFile, std::ios::binary);
+  stream.write("RIFF", 4);
+  write<int>(stream, 36 + bufSize);
+  stream.write("WAVE", 4);
+  stream.write("fmt ", 4);
+  write<int>(stream, 16);
+  write<short>(stream, 1);                                        // Format (1 = PCM)
+  write<short>(stream, channels);                                 // Channels
+  write<int>(stream, sampleRate);                                 // Sample Rate
+  write<int>(stream, sampleRate * channels * sizeof(SampleType)); // Byterate
+  write<short>(stream, channels * sizeof(SampleType));            // Frame size
+  write<short>(stream, 8 * sizeof(SampleType));                   // Bits per sample
+  stream.write("data", 4);
+  stream.write((const char*)&bufSize, 4);
+  stream.write((const char*)buf, bufSize);
+}
+
+string itoa(int num)
+{
+  stringstream s;
+  s<<num;
+  return s.str();
+}
+
 int main(){
 	//Cargar ventana renderizada
 	RenderWindow App(VideoMode(600,500,32),"Role&Music v1.0.0");
 	//Variables
 	bool Set_Rep=false;
 	bool Sel_Lab[7];
+	bool Load_Sou[7];
     //Inicializacion de variables
-    for(int i=0;i<7;i++)
+    for(int i=0;i<7;i++){
         Sel_Lab[i]=false;
+        Load_Sou[i]=false;
+    }
     //Creacion de objetos
     Texture TX[7];
     Sprite BG;
@@ -27,9 +65,12 @@ int main(){
     Sprite SelLab[7];
     Text Textos[2];
     Font fuente;
-	Music Pistas[7];
+	Sound Pistas[7];
+	SoundBuffer Pistas_[7];
 	String Cancion;
 	Text Canciones[7];
+	Text Volumen[7];
+	int volumen_[7];
 	string str;
 	//Inicializacion de objetos
         //Fuente
@@ -74,6 +115,14 @@ int main(){
             SelLab[i].setTexture(TX[6]);
             SelLab[i].setPosition(10,150+(45*i));
         }
+        for(int i=0;i<7;i++){
+            volumen_[i] = 50;
+            Pistas[i].setVolume(volumen_[i]);
+            Volumen[i].setFont(fuente);
+            Volumen[i].setColor(Color::Black);
+            Volumen[i].setPosition(Stop[i].getPosition()+Vector2f(64,4));
+            Volumen[i].setString(String());
+        }
 
     //Inicio lazo principal
     while(App.isOpen()){
@@ -81,6 +130,126 @@ int main(){
         if(App.pollEvent(evento)){
             if(evento.type == Event::Closed){
                 App.close();
+            }
+            //Botones teclado
+            if(Set_Rep==true){
+            if(Keyboard::isKeyPressed(Keyboard::Key::Q)){
+                if(volumen_[0]<100){
+                    Pistas[0].setVolume(volumen_[0]+1);
+                    volumen_[0]+=1;
+                }
+            }
+            if(Keyboard::isKeyPressed(Keyboard::Key::A)){
+                if(volumen_[0]>0){
+                    Pistas[0].setVolume(volumen_[0]+1);
+                    volumen_[0]-=1;
+                }
+            }
+            if(Keyboard::isKeyPressed(Keyboard::Key::W)){
+                if(volumen_[1]<100){
+                    Pistas[1].setVolume(volumen_[1]+1);
+                    volumen_[1]+=1;
+                }
+            }
+            if(Keyboard::isKeyPressed(Keyboard::Key::S)){
+                if(volumen_[1]>0){
+                    Pistas[1].setVolume(volumen_[1]+1);
+                    volumen_[1]-=1;
+                }
+            }
+            if(Keyboard::isKeyPressed(Keyboard::Key::E)){
+                if(volumen_[2]<100){
+                    Pistas[2].setVolume(volumen_[2]+1);
+                    volumen_[2]+=1;
+                }
+            }
+            if(Keyboard::isKeyPressed(Keyboard::Key::D)){
+                if(volumen_[2]>0){
+                    Pistas[2].setVolume(volumen_[2]+1);
+                    volumen_[2]-=1;
+                }
+            }
+            if(Keyboard::isKeyPressed(Keyboard::Key::R)){
+                if(volumen_[3]<100){
+                    Pistas[3].setVolume(volumen_[3]+1);
+                    volumen_[3]+=1;
+                }
+            }
+            if(Keyboard::isKeyPressed(Keyboard::Key::F)){
+                if(volumen_[3]>0){
+                    Pistas[3].setVolume(volumen_[3]+1);
+                    volumen_[3]-=1;
+                }
+            }
+            if(Keyboard::isKeyPressed(Keyboard::Key::T)){
+                if(volumen_[4]<100){
+                    Pistas[4].setVolume(volumen_[4]+1);
+                    volumen_[4]+=1;
+                }
+            }
+            if(Keyboard::isKeyPressed(Keyboard::Key::G)){
+                if(volumen_[4]>0){
+                    Pistas[4].setVolume(volumen_[4]+1);
+                    volumen_[4]-=1;
+                }
+            }
+            if(Keyboard::isKeyPressed(Keyboard::Key::Y)){
+                if(volumen_[5]<100){
+                    Pistas[5].setVolume(volumen_[5]+1);
+                    volumen_[5]+=1;
+                }
+            }
+            if(Keyboard::isKeyPressed(Keyboard::Key::H)){
+                if(volumen_[5]>0){
+                    Pistas[5].setVolume(volumen_[5]+1);
+                    volumen_[5]-=1;
+                }
+            }
+            if(Keyboard::isKeyPressed(Keyboard::Key::U)){
+                if(volumen_[6]<100){
+                    Pistas[6].setVolume(volumen_[6]+1);
+                    volumen_[6]+=1;
+                }
+            }
+            if(Keyboard::isKeyPressed(Keyboard::Key::J)){
+                if(volumen_[6]>0){
+                    Pistas[6].setVolume(volumen_[6]+1);
+                    volumen_[6]-=1;
+                }
+            }
+            //Quickplay
+            if(Keyboard::isKeyPressed(Keyboard::Key::Z)){
+                Pistas[0].play();
+            }
+            if(Keyboard::isKeyPressed(Keyboard::Key::X)){
+                Pistas[1].play();
+            }
+            if(Keyboard::isKeyPressed(Keyboard::Key::C)){
+                Pistas[2].play();
+            }
+            if(Keyboard::isKeyPressed(Keyboard::Key::V)){
+                Pistas[3].play();
+            }
+            if(Keyboard::isKeyPressed(Keyboard::Key::B)){
+                Pistas[4].play();
+            }
+            if(Keyboard::isKeyPressed(Keyboard::Key::N)){
+                Pistas[5].play();
+            }
+            if(Keyboard::isKeyPressed(Keyboard::Key::M)){
+                Pistas[6].play();
+            }
+            /*if(Keyboard::isKeyPressed(Keyboard::Key::I)){
+                size_t cont=0;
+                for(int i=0;i<7;i++){
+                    if(Load_Sou[i]){
+                        cont += Pistas_[i].getSampleCount();
+                    }
+                }
+                short *samples = new short[cont];
+
+            }*/
+            //Fin Botones teclado
             }
             if(evento.type == Event::MouseButtonPressed){
                 if(evento.mouseButton.button == Mouse::Left){
@@ -101,12 +270,16 @@ int main(){
 								Set_Rep=true;
 								for(int i=0;i<7;i++){
                                     if(!Canciones[i].getString().isEmpty())
-                                        Pistas[i].openFromFile(String("Samples/")+String(Canciones[i].getString()));
+                                        if(Pistas_[i].loadFromFile(String("Samples/")+String(Canciones[i].getString())))
+                                            Load_Sou[i]=true;
+                                        Pistas[i].setBuffer(Pistas_[i]);
+                                        Pistas[i].setVolume(50);
 								}
 							}else{
 								Set_Rep=false;
 								for(int i=0;i<7;i++){
                                     Pistas[i].stop();
+                                    Pistas_[i] = SoundBuffer();
 								}
 							}
                     }//Fin if Modo reproductor
@@ -147,13 +320,29 @@ int main(){
                     }
             }
             //Fin evento entrada por teclado
-            if(Keyboard::isKeyPressed(Keyboard::Key::BackSpace)){
+            //Borrar toda la cadena
+            if(Keyboard::isKeyPressed(Keyboard::Key::Delete)){
                 for(int i=0;i<7;i++){
                     if(Sel_Lab[i]==true && Set_Rep == false){
                         str=string();
+                        Load_Sou[i]=false;
                     }
                 }
             }
+            //Borrar solo un caracter
+            if(Keyboard::isKeyPressed(Keyboard::Key::BackSpace)){
+                for(int i=0;i<7;i++){
+                    if(Sel_Lab[i]==true && Set_Rep == false && str.length()!=0){
+                        str.erase((str.length()-1),1);
+                    }
+                    if(str.length()==0){
+                        Load_Sou[i]=false;
+                    }
+                }
+            }
+        }
+        for(int i=0;i<7;i++){
+            Volumen[i].setString(itoa(Pistas[i].getVolume()));
         }
         if(Set_Rep==false){
             for(int i=0;i<7;i++){
@@ -172,6 +361,7 @@ int main(){
             App.draw(Play[i]);
             App.draw(Stop[i]);
             App.draw(Label[i]);
+            App.draw(Volumen[i]);
         }
         if(Set_Rep==true){
 				App.draw(Repr[0]);

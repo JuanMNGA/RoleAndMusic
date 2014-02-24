@@ -1,6 +1,8 @@
 # depslib dependency file v1.0
-1389258877 source:/home/juanmi/Projects/RoleAndMusic/main.cpp
+1393235665 source:/home/juanmi/Projects/RoleAndMusic/main.cpp
 	<iostream>
+	<sstream>
+	<fstream>
 	<SFML/Graphics.hpp>
 	<SFML/Audio.hpp>
 	<SFML/System.hpp>
@@ -406,4 +408,6 @@
 	<SFML/System/Time.hpp>
 	<vector>
 	<string>
+
+1314294241 /home/juanmi/Projects/RoleAndMusic/portaudio.h
 
