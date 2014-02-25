@@ -1,8 +1,9 @@
 # depslib dependency file v1.0
-1393262289 source:/home/juanmi/Projects/RoleAndMusic/main.cpp
+1393325750 source:/home/juanmi/Projects/RoleAndMusic/main.cpp
 	<iostream>
 	<sstream>
 	<fstream>
+	<cstdlib>
 	<SFML/Graphics.hpp>
 	<SFML/Audio.hpp>
 	<SFML/System.hpp>

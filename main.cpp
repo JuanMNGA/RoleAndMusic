@@ -1,6 +1,8 @@
 #include <iostream>
 #include <sstream>
 #include <fstream>
+#include <cstdlib>
+#include <thread>
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
 #include <SFML/System.hpp>
@@ -9,6 +11,10 @@
 
 using namespace sf;
 using namespace std;
+
+void grabar(){
+    system("arecord -D sysdefault:0,0 -f cd Samples/test.wav");
+}
 
 template <typename T>
 void write(std::ofstream& stream, const T& t) {
@@ -239,16 +245,10 @@ int main(){
             if(Keyboard::isKeyPressed(Keyboard::Key::M)){
                 Pistas[6].play();
             }
-            /*if(Keyboard::isKeyPressed(Keyboard::Key::I)){
-                size_t cont=0;
-                for(int i=0;i<7;i++){
-                    if(Load_Sou[i]){
-                        cont += Pistas_[i].getSampleCount();
-                    }
-                }
-                short *samples = new short[cont];
-
-            }*/
+            if(Keyboard::isKeyPressed(Keyboard::Key::I)){
+                //thread nHilo(grabar);
+                //nHilo.join();
+            }
             //Fin Botones teclado
             }
             if(evento.type == Event::MouseButtonPressed){
